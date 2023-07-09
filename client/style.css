@@ -38,24 +38,58 @@ body {
   flex: 1;
   width: 200px;
   height: 80px;
-  overflow-y: hidden;
-  position: absolute; left:10px; top:40px;
+  overflow-y: auto; /* Change 'hidden' to 'auto' */
+  position: absolute;
+  left: 10px;
+  top: 40px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  padding-bottom: 20px;
-  scroll-behavior: smooth;
 }
 
-/* hides scrollbar */
+
+#chat_container_2 {
+  flex: 1;
+  width: 200px;
+  height: 80px;
+  overflow-y: auto; /* Change 'hidden' to 'auto' */
+  position: absolute;
+  left: 10px;
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Optional: Customize the appearance of the scrollbar */
 #chat_container::-webkit-scrollbar {
-  display: none;
+  width: 8px;
 }
 
+#chat_container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+#chat_container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+#chat_container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 .wrapper {
   width: 100%;
   padding: 15px;
@@ -106,8 +140,8 @@ body {
 .message {
   flex: 1;
 
-  color: hsl(305, 15%, 33%);
-  font-size: 20px;
+  color: hsl(300, 4%, 84%);
+  font-size: 15px;
   font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   font-weight: bolder;
   max-width: 100%;
@@ -129,6 +163,22 @@ body {
 .message::-webkit-scrollbar {
   display: none;
 }
+#container {
+  height:80px;
+  width:200px;
+  background-color:#ac790b;
+  color: white;
+  padding:5%;
+  text-align: center;
+  position:sticky;
+  display: flex;
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-weight: bolder; 
+  font-size: 20px;
+  padding: 10px;
+}
+
+
 
 form {
   width: 300px;
@@ -140,8 +190,7 @@ form {
   display: flex;
   flex-direction: row;
   gap: 10px;
-  overflow: hidden;
-  scrollbar-width: none;
+
 }
 
 .form::-webkit-scrollbar{

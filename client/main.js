@@ -20,6 +20,7 @@ function loader(element){
 
 function typeText(element,text){
     let index = 0;
+    console.log(text)
     let interval = setInterval(() => {
         if (index <text.length){
             element.innerHTML += text.charAt(index);
@@ -56,6 +57,22 @@ function chatstripe(isAi, value, uniqueId) {
 
   }
   
+  function fight(tone){
+    if (tone < -2){
+      frame_y =0;
+      frame_x = 0;
+      enemy_x = enemy_x -120;
+      if (loop_2===50){
+        enemy_x = enemy_x +120;
+      }
+      
+  
+    }
+  }
+  
+
+
+  
 
   const handleSubmit = async (e) => {
 
@@ -64,20 +81,23 @@ function chatstripe(isAi, value, uniqueId) {
 
     data.get('prompt');
     form.reset();
-
+    chatContainer.innerHTML=""
     const uniqueId = generateUniqueId();
     chatContainer.innerHTML += chatstripe(true, "", uniqueId);
     chatContainer.scrollTop = chatContainer.scrollHeight;
+    chatContainer.style.display = 'flex';
     const messageDiv = document.getElementById(uniqueId);
     loader(messageDiv);
+    console.log(enemy)
 
-    const response = await fetch('https://npc-game.onrender.com/', {
+    const response = await fetch('http://localhost:5000', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body:JSON.stringify({
-        prompt:data.get('prompt')
+        prompt:data.get('prompt'),
+        enemy:enemy
       })
     })
     clearInterval(loadInterval);
@@ -85,8 +105,14 @@ function chatstripe(isAi, value, uniqueId) {
 
     if(response.ok){
       const data = await response.json();
+      const sentimentScore = data.sentiment;
+      const tone = sentimentScore
+      
+      fight(tone)
       const parsedData = data.bot.trim();
+      console.log(parsedData)
       typeText(messageDiv, parsedData);
+      
     } else {
       const err = await response.text();
       messageDiv.innerHTML = "Something went wrong";
@@ -131,11 +157,23 @@ function chatstripe(isAi, value, uniqueId) {
 
   const CANVAS_WIDTH = canvas.width = 600;
   const CANVAS_HEIGHT = canvas.height = 500;
-
+  const ThomasImage = new Image();
+  ThomasImage.src ='assets/Teen Bot/Transparent PNG/00_idle/skeleton-00_idle_00.png'
   const playerImage = new Image();
-  playerImage.src = 'assets/Transparent PNG/00_idle/skeleton-00_idle_00.png'
+  playerImage.src = 'assets/Transparent PNG/spritesheet/skeleton-00_idle_00.png'
+  const enemyImage = new Image();
+  enemyImage.src = 'assets/Minotaur_2/PNG/PNG Sequences/Idle Blinking/PineTools.com_files/spritesheet (26).png'
+  
+  
+  const enemyImageAttack = new Image();
+  enemyImageAttack.src = 'assets/Minotaur_2/PNG/PNG Sequences/Slashing/spritesheet (24).png'
 
-  let gameSpeed =0.01;
+
+
+
+
+
+  let gameSpeed =0.1;
   const backgroundLayer1 = new Image();
   backgroundLayer1.src ='assets/PNG/platformer_background_3/Layers/layer01_Ground.png'
   const backgroundLayer2 = new Image();
@@ -193,31 +231,29 @@ function chatstripe(isAi, value, uniqueId) {
   const layer2 = new Layer(backgroundLayer2, 0);
   const layer3 = new Layer(backgroundLayer3,0);
   const layer4 = new Layer(backgroundLayer4, 0);
-  const layer5 = new Layer(backgroundLayer5,0);
-  const layer6 = new Layer(backgroundLayer6,0.1);
+  const layer5 = new Layer(backgroundLayer5,1);
+  const layer6 = new Layer(backgroundLayer6,0);
   const layer7 = new Layer(backgroundLayer7, 0);
   
   //const  = document.querySelector('form');
   
   const gameObjects = [layer7,layer6,layer5,layer3,layer2,layer1];
-  let player_x = 100;
-  let player_y = 240;
-  let enemy_x = 300;
-  let enemy_y = 300;
+  let player_x = 270;
+  let player_y = 245;
+  let enemy_x = 400;
+  let enemy_y = 230;
 
 
   function form_appear(){
     form.style.display = 'flex';
-    form.style.left = window.innerWidth/2 - (CANVAS_WIDTH/2) + player_x -50 + "px" ;
-    form.style.top = window.innerHeight/2 - (CANVAS_HEIGHT/2) + player_y - 40+ "px";
+    form.style.left = window.innerWidth/2 - (CANVAS_WIDTH/2) + player_x+20  + "px" ;
+    form.style.top = window.innerHeight/2 - (CANVAS_HEIGHT/2) + player_y - 20+ "px";
   }
 
   function enemy_form_appear(){
-    //chatContainer.innerHTML=""
-    //const uniqueId_2 = generateUniqueId();
-    //chatContainer.innerHTML += chatstripe(true, "", uniqueId_2);
-    chatContainer.style.left = window.innerWidth/2 - (CANVAS_WIDTH/2) + enemy_x -50 + "px" ;
-    chatContainer.style.top = window.innerHeight/2 - (CANVAS_HEIGHT/2) + enemy_y - 90+ "px";
+
+    chatContainer.style.left = window.innerWidth/2 - (CANVAS_WIDTH/2) + enemy_x +85 + "px" ;
+    chatContainer.style.top = window.innerHeight/2 - (CANVAS_HEIGHT/2) + enemy_y + "px";
   }
   
 
@@ -244,40 +280,104 @@ function chatstripe(isAi, value, uniqueId) {
 
 
 
-  function positionChat(){
-    chatContainer.style.left = window.innerWidth/2 - (CANVAS_WIDTH/2) + enemy_x -30 + "px" ;
-    chatContainer.style.top = window.innerHeight/2 - (CANVAS_HEIGHT/2) + enemy_y - 50+ "px";
+  function positionElement(element){
+    element.style.left = window.innerWidth/2 - (CANVAS_WIDTH/2) + enemy_x +75 + "px" ;
+    element.style.top = window.innerHeight/2 - (CANVAS_HEIGHT/2) + enemy_y - 10+ "px";
+  }
+  function destroyElement(element){
+    element.style.display = 'none'
+  }
+  function reviveElement(element){
+    element.style.display = 'flex';
   }
 
 
+
+  const Container = document.querySelector('#container');
+  Container.innerHTML = "Press 'x' to interact";
+
+
+
+
+  let frame_x = 0;
+  let frame_y = 1;
+  let cut_out_x = 200;
+  let cut_out_y = 200;
+  let loop = 0;
+  let loop_2 =0;
   form.style.display = 'none';
+  destroyElement(Container)
+  let counter = 0
+  let revist = 0
+  let enemy = 0
+  
+  if(revist ==1){
+    enemy_x = enemy_x -120
+  }
+  
   function animate(){
     ctx.clearRect(0,0, CANVAS_WIDTH, CANVAS_HEIGHT);
     gameObjects.forEach(object => {
       object.update();
       object.draw();
     });
-    if(enemy_x - player_x <= 200){
-      
-      //const uniqueId_1 = generateUniqueId();
-      //chatContainer.innerHTML = ""
-      //chatContainer.innerHTML += proxProp(true, "PRESS 'X' TO TALK", uniqueId_1);
-      //positionChat()
+    if(enemy_x - player_x <= 150){
+      if(loop< 1){;
+        reviveElement(Container)
+        enemy =0
+      }
+      positionElement(Container)
       document.addEventListener('keydown', function(event) {
         const key = event.key.toLowerCase()
         if (key === 'x') {
-          
+          loop +=3
+          destroyElement(Container)
           enemy_form_appear()
           form_appear()
         }
       });
     } else{
-      form.style.display = 'none';
+      destroyElement(form)
+      destroyElement(Container)
     }
-    ctx.drawImage(playerImage, player_x,player_y, 200, 184 );
-    ctx.fillRect(300,300,100,100);
-    requestAnimationFrame(animate);
+    ctx.drawImage(playerImage, player_x,245, 195, 180  );
+    ctx.drawImage(ThomasImage,  0,245, 195, 180 );
     
+
+ 
+      // remember when you couldnt figure out it stopped at the wrong frame
+
+  
+
+    ctx.drawImage(enemyImage,frame_x*cut_out_x, frame_y*cut_out_y, cut_out_x, cut_out_y,  enemy_x,enemy_y,210,230);
+    
+    if(frame_y === 1){
+      counter+=1
+      if (counter %4 ===0){
+          frame_x++
+      }
+      if (frame_x > 16){
+        frame_x = 0
+        counter = 20
+      }
+    }
+
+    if (frame_y === 0){
+      loop_2+=1
+      if (loop_2 %2 ===0){
+        frame_x ++
+      }
+      if(frame_x>11){
+        frame_x = 11
+
+        
+      }
+    }
+
+
+  
+    requestAnimationFrame(animate);
+
   }
   animate();
 
