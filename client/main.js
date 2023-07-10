@@ -314,6 +314,13 @@ function chatstripe(isAi, value, uniqueId) {
   if(revist ==1){
     enemy_x = enemy_x -120
   }
+  document.addEventListener('keydown', function(event) {
+    const key = event.key.toLowerCase()
+    if (key === '#') {
+      enemy =1
+      console.log(enemy)
+    }
+  });
   
   function animate(){
     ctx.clearRect(0,0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -324,7 +331,7 @@ function chatstripe(isAi, value, uniqueId) {
     if(enemy_x - player_x <= 150){
       if(loop< 1){;
         reviveElement(Container)
-        enemy =0
+        
       }
       positionElement(Container)
       document.addEventListener('keydown', function(event) {
@@ -380,4 +387,3 @@ function chatstripe(isAi, value, uniqueId) {
 
   }
   animate();
-

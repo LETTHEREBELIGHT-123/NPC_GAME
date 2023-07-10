@@ -59,13 +59,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+
 }
 
 
 
+#chat_container_2::-webkit-scrollbar-thumb {
+  background: #888;
+  
+}
+
+#chat_container_2::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 
 
-
+#chat_container_2::-webkit-scrollbar{
+  display: none;
+}
 
 
 
@@ -177,6 +188,8 @@ body {
   font-size: 20px;
   padding: 10px;
 }
+
+
 
 
 

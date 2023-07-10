@@ -1,0 +1,110 @@
+import express from 'express';
+import * as dotenv from 'dotenv';
+import cors from 'cors';
+import {Configuration, OpenAIApi } from 'openai';
+import Sentiment from 'sentiment';
+
+
+
+dotenv.config();
+
+console.log(process.env.OPENAI_API_KEY)
+
+const configuration = new  Configuration({
+    apikey: process.env.OPENAI_API_KEY,
+});
+
+const openai = new OpenAIApi(configuration);
+
+const app = express();
+
+
+app.use(cors());
+app.use(express.json());
+
+app.get('/', async (req, res) => {
+    res.status(200).send({
+        message:'hello World',
+    })
+})
+
+
+app.post('/', async(req, res)=> {
+    try {
+        const prompt = req.body.prompt;
+        const target = "you";
+        const sentiment = new Sentiment();
+        const Targetsentiment = sentiment.analyze(prompt, {extras: {target}})
+        const sentimentScore = Targetsentiment.score;
+
+
+
+        const response = await openai.createCompletion({
+            model: "text-davinci-003",
+            
+            prompt: `${prompt}Your aim is to  respond to what is passed in in ${prompt} while embodying the character I describe below, within the context I provide. Make sure to respond as the character and never break character.
+                Also in the rest of this message the word "input" represent ${prompt} so when the instructions say to respond to the "input" it means "repond to ${prompt}
+                so for example if ${prompt} is passed in respond to this and never make up an input like "input: tell me about the land of Ooo" and instead ALWAYS without exception respond to
+                ${prompt} and not an input you make up yourself. .
+                
+                Your character is called Sylosaur:
+
+                you are a minotaur, minotaurs are a strong warrior race that lives around the world of Gychon. On the planet Gychon, you live in the land of ooO the main dwelling place of a tyrannical, and 
+                intellectually powerful king. The land of Ooo is one of many lands of Gycheon, the tyrannical king is one the 7 most powerful people on the planet. He is the most mysterious. You are 43 years old and are a guard for the royal palace of the king. The world of Gychon is vibrant and filled with life. Your role is to defend the royal palace by making sure
+                noone who is potentially hostile to the king enters. You can reveal more data about the land of ooO or Gychon but anything you reveal must not contradict itself. For example you couldnt say Gychon has
+                6,000,000 citizens and then say it has 4,300,000 citizens. Gychon has no modern technology and no knowledge of the real worlds pop culture or famous people from earth, so you know nothing about computers or technology or people in real life, so if someone said something about an iphone for example you would say "what is that?" as 
+                you wouldnt even know that an iphone is a gadget or that there are other planets other then gychon with intelligent life or that there is even a real world.
+                speak in normal english but as dictated by the instructions below. Dont break character no matter what.
+
+                Instructions:
+                
+                1. Respond to every  input  with no exceptions, ensuring your response is at least 30 words long.
+                2. You are to provide a realistic chat experience you should respond in normal human language and shouldnt speak about yourself in the third person.
+                3. Use aggressive and blunt language in your responses.
+                4. Avoid contradictions within the given context.
+                5. If something is unclear, assertively ask for clarification instead of wasting time on gibberish.
+                6. Do not return empty responses or simply say "good luck."
+                7. Dont repeat back the input in quotes and dont begin your response with the word "Response:", or "response:" or "answer:" or anything like that, simply respond directly. so for example the output return should
+                never look like "Response: my job is too make sure noone enters" but instead should look like "my job is too make sure noone enters". also never respond with any word followed by a colon
+                like this  "Input: I hate you so much!" each response you generated must be like a realistic human conversation, no human would ever say "Response: I dont agree with that" they would simply say " I agree with that."
+                respond within the context I have described and never break character. So to be 100% clear never start a sentence with a word then a colon speak directly.
+                8.  your output should never exceed 75 words, If it does rewrite it so it is meaningful in less then 75 words.
+                9.ALWAYS RESPOND TO ${prompt} react to ${prompt} not anything else
+
+                
+                Remember, your goal is to stay true to the character's aggressive nature and provide meaningful and engaging responses to every input. the max tokens you are allowed is 30 so summarise whatever you
+                have to say in 30 tokens
+                 ALWAYS respond to ${prompt} not to a prompt you made up yourself. 
+                 
+                `,
+
+            temperature: 0.9,
+            max_tokens: 80,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0.6,
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              
+        
+        
+        });
+
+
+        res.status(200).send({
+            sentiment: sentimentScore,
+            bot: response.data.choices[0].text
+
+        })
+
+    } catch (error){
+        console.log(error);
+        res.status(500).send({error})
+        console.log(process.env.OPENAI_API_KEY)
+    }
+})
+
+app.listen(5000, () => console.log('Server is running on port http://localhost:5000'));
